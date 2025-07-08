@@ -7,7 +7,6 @@ import pytesseract
 router = APIRouter()
 
 async def solve_captcha(page):
-    # Ждём появление картинки капчи
     img = await page.wait_for_selector(".code img")
     src = await img.get_attribute("src")
     if src.startswith("data:image"):
@@ -16,7 +15,6 @@ async def solve_captcha(page):
     else:
         resp = await page.request.get(src)
         data = await resp.body()
-    # Сохраняем во временный файл и распознаём
     with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as f:
         f.write(data)
         path = f.name
@@ -34,17 +32,12 @@ async def fetch_vehicle(vin: str):
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
         await page.goto(LOGIN_URL)
-        # Вводим логин/пароль
         await page.fill("input[placeholder='Логин']", username)
         await page.fill("input[placeholder='Пароль']", password)
-        # Решаем капчу
         code = await solve_captcha(page)
         await page.fill("input[placeholder='Проверочный код']", code)
-        # Кликаем кнопку Логин
         await page.click("button:has-text('Логин')")
-        # Ждём навигации
         await page.wait_for_url(TARGET_URL, timeout=10000)
-        # Переходим на страницу структуры
         await page.goto(TARGET_URL)
         try:
             await page.wait_for_selector(".ivu-tree", timeout=5000)

@@ -20,7 +20,9 @@ app.include_router(vin_router, prefix="/api", tags=["vin"])
 async def root():
     return """
 <!DOCTYPE html>
-<html><head><meta charset="utf-8"/><title>XCMG VIN Lookup</title></head><body>
+<html>
+<head><meta charset="utf-8"/><title>XCMG VIN Lookup</title></head>
+<body>
 <h1>Введите VIN-код машины</h1>
 <input type="text" id="vinInput" placeholder="Например: LXGCPA339LA025257"/>
 <button onclick="lookup()">Найти</button>
@@ -39,6 +41,7 @@ async function lookup() {
   const data = await resp.json();
   document.getElementById('result').innerHTML = data.html;
 }
-</script></body></html>
+</script>
+</body>
+</html>
 """
-
