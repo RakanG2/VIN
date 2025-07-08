@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from dotenv import load_dotenv
-import os
 
 load_dotenv()
 
@@ -19,39 +18,27 @@ app.include_router(vin_router, prefix="/api", tags=["vin"])
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
-    # Simple HTML page with VIN input form
     return """
 <!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8"/>
-  <title>XCMG VIN Lookup</title>
-</head>
-<body>
-  <h1>Введите VIN-код машины</h1>
-  <input type="text" id="vinInput" placeholder="Например: LXGCPA339LA025257"/>
-  <button onclick="lookup()">Найти</button>
-  <div id="result"></div>
-  <script>
-    async function lookup() {
-      const vin = document.getElementById('vinInput').value.trim();
-      if (!vin) return alert('Введите VIN-код');
-      document.getElementById('result').innerHTML = 'Загружается...';
-      try {
-        const resp = await fetch(`/api/vin/${vin}`);
-        if (!resp.ok) {
-          const err = await resp.json();
-          document.getElementById('result').innerHTML = '<p style="color:red;">' + err.detail + '</p>';
-          return;
-        }
-        const data = await resp.json();
-        // data.html contains full SPA HTML
-        document.getElementById('result').innerHTML = data.html;
-      } catch (e) {
-        document.getElementById('result').innerHTML = '<p style="color:red;">Ошибка запроса</p>';
-      }
-    }
-  </script>
-</body>
-</html>
+<html><head><meta charset="utf-8"/><title>XCMG VIN Lookup</title></head><body>
+<h1>Введите VIN-код машины</h1>
+<input type="text" id="vinInput" placeholder="Например: LXGCPA339LA025257"/>
+<button onclick="lookup()">Найти</button>
+<div id="result"></div>
+<script>
+async function lookup() {
+  const vin = document.getElementById('vinInput').value.trim();
+  if (!vin) return alert('Введите VIN-код');
+  document.getElementById('result').innerHTML = 'Загружается...';
+  const resp = await fetch(`/api/vin/${vin}`);
+  if (!resp.ok) {
+    const err = await resp.json();
+    document.getElementById('result').innerHTML = '<p style="color:red;">' + err.detail + '</p>';
+    return;
+  }
+  const data = await resp.json();
+  document.getElementById('result').innerHTML = data.html;
+}
+</script></body></html>
 """
+
